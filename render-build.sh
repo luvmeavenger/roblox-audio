@@ -2,18 +2,22 @@
 # exit on error
 set -o errexit
 
-echo "Starting build process..."
+# Create a fake tput so Render's internal script stops crashing
+mkdir -p internal_bin
+echo -e '#!/bin/sh\nexit 0' > internal_bin/tput
+chmod +x internal_bin/tput
 
-# 1. Install Python dependencies
+# Temporarily add our fake tput to the path for the build
+export PATH=$(pwd)/internal_bin:$PATH
+
+echo "--- Starting Real Build ---"
+
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# 2. Setup FFmpeg
-echo "Downloading FFmpeg..."
+# Download FFmpeg
 mkdir -p bin
 curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz | tar -xJ --strip-components=1 -C bin
-
-# 3. Make sure the bin folder is usable
 chmod +x bin/ffmpeg
 
-echo "Build complete!"
+echo "--- Build Finished Successfully ---"
