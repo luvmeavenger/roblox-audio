@@ -2,15 +2,18 @@
 # exit on error
 set -o errexit
 
-# The "Silencer": Creates a fake tput command so the build doesn't crash
-mkdir -p internal_bin
-echo -e '#!/bin/sh\nexit 0' > internal_bin/tput
-chmod +x internal_bin/tput
-export PATH=$PATH:$(pwd)/internal_bin
+echo "Starting build process..."
 
-# Standard build steps
+# 1. Install Python dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Download FFmpeg
+# 2. Setup FFmpeg
+echo "Downloading FFmpeg..."
 mkdir -p bin
 curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz | tar -xJ --strip-components=1 -C bin
+
+# 3. Make sure the bin folder is usable
+chmod +x bin/ffmpeg
+
+echo "Build complete!"
